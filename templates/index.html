@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Ticket Booking - IRCTC Mini</title>
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .fingerprint-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .fingerprint-info strong {
+            color: #333;
+        }
+
+        .dashboard-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dashboard-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dashboard-link a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚂 Train Ticket Booking</h1>
+            <p>Book your train tickets easily</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="bookingForm">
+            <div class="form-group">
+                <label for="name">Passenger Name</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="source">From (Source Station)</label>
+                <select id="source" name="source" required>
+                    <option value="">Select source station</option>
+                    <option value="Mumbai">Mumbai Central</option>
+                    <option value="Delhi">New Delhi</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Chennai">Chennai Central</option>
+                    <option value="Kolkata">Howrah Junction</option>
+                    <option value="Hyderabad">Hyderabad Deccan</option>
+                    <option value="Pune">Pune Junction</option>
+                    <option value="Ahmedabad">Ahmedabad Junction</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="destination">To (Destination Station)</label>
+                <select id="destination" name="destination" required>
+                    <option value="">Select destination station</option>
+                    <option value="Mumbai">Mumbai Central</option>
+                    <option value="Delhi">New Delhi</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Chennai">Chennai Central</option>
+                    <option value="Kolkata">Howrah Junction</option>
+                    <option value="Hyderabad">Hyderabad Deccan</option>
+                    <option value="Pune">Pune Junction</option>
+                    <option value="Ahmedabad">Ahmedabad Junction</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn" id="bookBtn">
+                Book Ticket
+            </button>
+        </form>
+
+        <div class="fingerprint-info">
+            <strong>🔐 Security Notice:</strong> This system uses browser fingerprinting to detect and prevent ticket booking fraud. Your browser fingerprint is being collected for security purposes.
+        </div>
+
+        <div class="dashboard-link">
+            <a href="/dashboard">View Admin Dashboard →</a>
+        </div>
+    </div>
+
+    <script>
+        let visitorId = null;
+
+        // Initialize FingerprintJS
+        const fpPromise = FingerprintJS.load();
+
+        (async () => {
+            const fp = await fpPromise;
+            const result = await fp.get();
+            visitorId = result.visitorId;
+            console.log('Browser Fingerprint:', visitorId);
+        })();
+
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const alertBox = document.getElementById('alertBox');
+            const bookBtn = document.getElementById('bookBtn');
+
+            // Check if fingerprint is ready
+            if (!visitorId) {
+                showAlert('Please wait, initializing security...', 'warning');
+                return;
+            }
+
+            // Get form data
+            const name = document.getElementById('name').value;
+            const source = document.getElementById('source').value;
+            const destination = document.getElementById('destination').value;
+
+            // Validate source and destination
+            if (source === destination) {
+                showAlert('Source and destination cannot be the same!', 'error');
+                return;
+            }
+
+            // Disable button and show loading
+            bookBtn.disabled = true;
+            bookBtn.innerHTML = '<span class="loading"></span> Booking...';
+
+            try {
+                const response = await fetch('/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        source,
+                        destination,
+                        fingerprint: visitorId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.is_suspicious) {
+                        showAlert(
+                            `⚠️ WARNING: This is your ${data.booking_count}th booking! Your activity has been flagged as suspicious.`,
+                            'warning'
+                        );
+                    } else {
+                        showAlert(
+                            `✅ ${data.message} (Booking #${data.booking_count})`,
+                            'success'
+                        );
+                    }
+                    
+                    // Reset form
+                    document.getElementById('bookingForm').reset();
+                } else {
+                    showAlert('❌ Booking failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Network error: ' + error.message, 'error');
+            } finally {
+                // Re-enable button
+                bookBtn.disabled = false;
+                bookBtn.innerHTML = 'Book Ticket';
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = 'alert ' + type;
+            alertBox.style.display = 'block';
+
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
