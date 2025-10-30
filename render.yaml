@@ -1,0 +1,11 @@
+# render.yaml
+services:
+  - type: web
+    name: ticket-booking-fraud-detection
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PORT
+        value: 10000
